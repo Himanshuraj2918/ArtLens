@@ -1,29 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { Palette, User, Calendar, MapPin, ExternalLink, Heart, Eye } from 'lucide-react';
+import { ShimmerGrid } from './ShimmerCard ';
+import InfiniteScrollLoader from './InfiniteScrollLoader';
 
 const ArtCard = () => {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://api.artic.edu/api/v1/artworks?page=1&limit=32");
+
+        if (page === 1) {
+          setLoading(true);
+        } else {
+          setLoadingMore(true);
+        }
+        const response = await fetch(`https://api.artic.edu/api/v1/artworks?page=${page}&limit=10`);
         const jsonData = await response.json();
-        setData(jsonData);
-        console.log(jsonData);
+        setData((prev) => ({
+          ...jsonData,
+          data: prev ? [...prev.data, ...jsonData.data] : jsonData.data
+        }));
+        console.log(data);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
     };
-    
+
     fetchData();
+  }, [page]);
+
+  const handleInfiniteScroll = async () => {
+    // console.log("scrollHeight: " +document.documentElement.scrollHeight);
+    // console.log("innerHeight: " +window.innerHeight);
+    // console.log("scrollTop: " +document.documentElement.scrollTop);
+
+    try {
+      if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    window.addEventListener("scroll", handleInfiniteScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleInfiniteScroll);
+    }
   }, []);
 
+  if (loading) {
+    return <ShimmerGrid count={32} />;
+  }
+
   return (
+    <div>
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
       {data?.data?.map((artwork) => (
-        <div 
-          key={artwork.id} 
+        <div
+          key={artwork.id}
           className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 cursor-pointer overflow-hidden"
         >
           <div className="w-full h-48 overflow-hidden bg-gray-100">
@@ -42,12 +85,12 @@ const ArtCard = () => {
               </div>
             )}
           </div>
-          
+
           <div className="p-4">
             <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
               {artwork.title || 'Untitled'}
             </h3>
-            
+
             {artwork.artist_display && (
               <div className="flex items-center space-x-2 mb-2">
                 <User size={14} className="text-gray-500" />
@@ -78,7 +121,7 @@ const ArtCard = () => {
                   <span className="font-medium">Medium:</span> {artwork.medium_display}
                 </div>
               )}
-              
+
               {artwork.dimensions_detail && artwork.dimensions_detail.length > 0 && (
                 <div className="text-xs text-gray-500">
                   <span className="font-medium">Dimensions:</span>
@@ -86,7 +129,7 @@ const ArtCard = () => {
                   {artwork.dimensions_detail[0].height && ` X ${artwork.dimensions_detail[0].height}H`}
                 </div>
               )}
-              
+
               {artwork.place_of_origin && (
                 <div className="text-xs text-gray-500 flex items-center">
                   <MapPin size={12} className="mr-1" />
@@ -106,11 +149,11 @@ const ArtCard = () => {
                   <span className="text-sm">View</span>
                 </button>
               </div>
-              
-              <a 
+
+              <a
                 href={`https://www.artic.edu/artworks/${artwork.id}`}
                 className="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <span>Learn more</span>
@@ -120,6 +163,9 @@ const ArtCard = () => {
           </div>
         </div>
       ))}
+    </div>
+
+    {loadingMore && <InfiniteScrollLoader />}
     </div>
   );
 };
