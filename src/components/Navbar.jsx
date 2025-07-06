@@ -2,10 +2,10 @@ import React from "react";
 import { Search, Sun, Moon, Menu } from "lucide-react";
 const Navbar = () => {
     return (
-        <div className="flex justify-center top-3 mt-5 ">
+        <div className="flex justify-center top-3 mt-5 sticky z-10">
             <div className="flex justify-between items-center p-2 bg-gray-50 border-solid border-2 border-gray-100 text-black w-2/3 rounded-2xl shadow-lg">
                 <div>
-                    <span className="text-2xl font-bold ml-2">Histobit</span>
+                    <span className="text-2xl font-bold ml-2">ArtLens</span>
                 </div>
 
                 <div className="flex items-center gap-10 ml-4">
