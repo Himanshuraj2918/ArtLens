@@ -94,7 +94,7 @@ const ArtCard = () => {
             {artwork.artist_display && (
               <div className="flex items-center space-x-2 mb-2">
                 <User size={14} className="text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-gray-700 line-clamp-1">
                   {artwork.artist_display}
                 </span>
               </div>
@@ -110,7 +110,7 @@ const ArtCard = () => {
             )}
 
             {artwork.provenance_text && (
-              <p className="text-sm text-gray-600 line-clamp-3 mb-3">
+              <p className="text-sm text-gray-600 line-clamp-3 mb-3 ">
                 {artwork.provenance_text}
               </p>
             )}
@@ -118,7 +118,7 @@ const ArtCard = () => {
             <div className="space-y-1 mb-4">
               {artwork.medium_display && (
                 <div className="text-xs text-gray-500">
-                  <span className="font-medium">Medium:</span> {artwork.medium_display}
+                  <span className="font-medium line-clamp-1">Medium:</span> {artwork.medium_display}
                 </div>
               )}
 
